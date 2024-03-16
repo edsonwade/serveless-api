@@ -14,6 +14,8 @@ import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,6 +24,8 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StreamLambdaHandlerTest {
+
+    private final static Logger log = LoggerFactory.getLogger(StreamLambdaHandlerTest.class);
 
     private static StreamLambdaHandler handler;
     private static Context lambdaContext;
@@ -33,10 +37,10 @@ public class StreamLambdaHandlerTest {
     }
 
     @Test
-    public void ping_streamRequest_respondsWithHello() {
+    void ping_streamRequest_respondsWithHello() {
         InputStream requestStream = new AwsProxyRequestBuilder("/ping", HttpMethod.GET)
-                                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                                            .buildStream();
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .buildStream();
         ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
 
         handle(requestStream, responseStream);
@@ -55,10 +59,10 @@ public class StreamLambdaHandlerTest {
     }
 
     @Test
-    public void invalidResource_streamRequest_responds404() {
+    void invalidResource_streamRequest_responds404() {
         InputStream requestStream = new AwsProxyRequestBuilder("/pong", HttpMethod.GET)
-                                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                                            .buildStream();
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .buildStream();
         ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
 
         handle(requestStream, responseStream);
@@ -72,7 +76,7 @@ public class StreamLambdaHandlerTest {
         try {
             handler.handleRequest(is, os, lambdaContext);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("handler test failed with message {} : ", e.getMessage());
             fail(e.getMessage());
         }
     }
@@ -81,7 +85,7 @@ public class StreamLambdaHandlerTest {
         try {
             return LambdaContainerHandler.getObjectMapper().readValue(responseStream.toByteArray(), AwsProxyResponse.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(" response read failed with message {} : ", e.getMessage());
             fail("Error while parsing response: " + e.getMessage());
         }
         return null;
