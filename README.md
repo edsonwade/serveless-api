@@ -80,3 +80,7 @@ $ curl -s https://xxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/ping | python
     "pong": "Hello, World!"
 }
 ```
+## Instruction to run http from terminal
+```
+https://www.baeldung.com/httpie-http-client-command-line
+```
